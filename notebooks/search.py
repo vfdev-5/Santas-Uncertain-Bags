@@ -123,11 +123,16 @@ def state_sequence(node):
     return states[::-1]
 
 
-def uniform_cost_search(problem, costfn=lambda node: node.path_cost):
+def uniform_cost_search(problem, costfn=lambda node: node.path_cost, **kwargs):
+    verbose = True if 'verbose' in kwargs and kwargs['verbose'] else False
     frontier = FrontierPQ(Node(problem.initial), costfn)
     explored = set()
     while frontier:
+        if verbose:
+            print("Frontier : ", frontier.states.keys())
         node = frontier.pop()
+        if verbose:
+            print("Check node: ", node.state, " | ", node.path_cost, ", ", costfn(node))
         if problem.is_goal(node.state):
             return node
         explored.add(node.state)
@@ -139,9 +144,9 @@ def uniform_cost_search(problem, costfn=lambda node: node.path_cost):
                 frontier.replace(child)
 
 
-def astar_search(problem, heuristic):
+def astar_search(problem, heuristic, **kwargs):
     costfn = lambda node: node.path_cost + heuristic(node.state)
-    return uniform_cost_search(problem, costfn)
+    return uniform_cost_search(problem, costfn, **kwargs)
 
 
 argmin = min
