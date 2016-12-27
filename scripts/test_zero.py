@@ -83,7 +83,7 @@ with open(data_file, 'r') as r:
 print 'Number of not added gifts: ', counter
 
 # Validation :
-scores = validation(bags, weight, 5)
+scores = validation(bags, weight, 100)
 print "Score: ", scores.mean()
 
 

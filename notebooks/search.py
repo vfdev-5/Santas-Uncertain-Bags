@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 import heapq
+import random
+import math
+import sys
 
 
 class Node(object):
@@ -25,6 +28,10 @@ class Node(object):
         result = problem.result(self.state, action)
         return Node(result, self, action,
                     problem.step_cost(self.state, action, result))
+
+    def expand(self, problem):
+        """List the nodes reachable in one step from this node."""
+        return [self.child(problem, action) for action in problem.actions(self.state)]
 
 
 class FrontierPQ:
@@ -92,6 +99,11 @@ class Problem(object):
         """The cost of taking this action from this state."""
         return 1  # Override this if actions have different costs
 
+    def value(self, state):
+        """For optimization problems, each state has a value.  Hill-climbing
+        and related algorithms try to maximize this value."""
+        raise NotImplementedError
+
 
 def action_sequence(node):
     """The sequence of actions to get to this node."""
@@ -130,3 +142,61 @@ def uniform_cost_search(problem, costfn=lambda node: node.path_cost):
 def astar_search(problem, heuristic):
     costfn = lambda node: node.path_cost + heuristic(node.state)
     return uniform_cost_search(problem, costfn)
+
+
+argmin = min
+argmax = max
+identity = lambda x: x
+
+
+def shuffled(iterable):
+    "Randomly shuffle a copy of iterable."
+    items = list(iterable)
+    random.shuffle(items)
+    return items
+
+
+def argmax_random_tie(seq, key=identity):
+    "Return an element with highest fn(seq[i]) score; break ties at random."
+    return argmax(shuffled(seq), key=key)
+
+
+def hill_climbing(problem):
+    """From the initial node, keep choosing the neighbor with highest value,
+    stopping when no neighbor is better. [Figure 4.2]"""
+    current = Node(problem.initial)
+    while True:
+        neighbors = current.expand(problem)
+        if not neighbors:
+            break
+        neighbor = argmax_random_tie(neighbors,
+                                     key=lambda node: problem.value(node.state))
+        if problem.value(neighbor.state) <= problem.value(current.state):
+            break
+        current = neighbor
+    return current.state
+
+
+def exp_schedule(k=20, lam=0.005, limit=100):
+    """One possible schedule function for simulated annealing"""
+    return lambda t: (k * math.exp(-lam * t) if t < limit else 0)
+
+
+def probability(p):
+    """Return true with probability p."""
+    return p > random.uniform(0.0, 1.0)
+
+
+def simulated_annealing(problem, schedule=exp_schedule()):
+    current = Node(problem.initial)
+    for t in range(sys.maxsize):
+        T = schedule(t)
+        if T == 0:
+            return current
+        neighbors = current.expand(problem)
+        if not neighbors:
+            return current
+        next = random.choice(neighbors)
+        delta_e = problem.value(next.state) - problem.value(current.state)
+        if delta_e > 0 or probability(math.exp(delta_e / T)):
+            current = next
