@@ -74,7 +74,7 @@ def weight_by_index(index):
     raise Exception("Index is out of bounds")
 
 
-def weight3(index, count=1000):
+def weight3(index, count=100):
     w = []
     for c in range(count):
         w.append(weight_by_index(index))
