@@ -1,6 +1,34 @@
 
 import numpy as np
 
+MAX_WEIGHT = 50
+N_BAGS = 1000
+
+N_HORSES = 1000
+N_BALLS = 1100
+N_BIKES = 500
+N_TRAINS = 1000
+N_COALS = 166
+N_BOOKS = 1200
+N_DOLLS = 1000
+N_BLOCKS = 1000
+N_GLOVES = 200
+
+AVAILABLE_GIFTS = {
+    "horse": N_HORSES,
+    "ball": N_BALLS,
+    "bike": N_BIKES,
+    "train": N_TRAINS,
+    "coal": N_COALS,
+    "book": N_BOOKS,
+    "doll": N_DOLLS,
+    "blocks": N_BLOCKS,
+    "gloves": N_GLOVES
+}
+
+GIFT_TYPES = sorted(list(AVAILABLE_GIFTS.keys()))
+N_TYPES = len(GIFT_TYPES)
+
 
 def validation(bags, weigth_func, count=5):
     """
@@ -79,3 +107,32 @@ def weight3(index, count=100):
     for c in range(count):
         w.append(weight_by_index(index))
     return np.mean(w)
+
+
+def bag_weight(bag, n1=100):
+    weight = 0
+    for index, count in enumerate(bag):
+        for i in range(count):
+            weight += weight3(index, n1)
+    return weight
+
+
+def score(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
+    scores = np.zeros(count)
+    rejected_bags = np.zeros(count)
+    for c in range(count):
+        score = 0
+        rejected = 0
+        for bag in state:
+            total_weight_ = bag_weight(bag, n1=1)
+            if total_weight_ < max_weight:
+                score += total_weight_
+            else:
+                rejected += 1
+        rejected_bags[c] = rejected
+        scores[c] = score
+    if return_rejected:
+        return np.mean(scores), np.mean(rejected_bags)
+    else:
+        return np.mean(scores)
+
