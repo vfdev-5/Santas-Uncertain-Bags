@@ -396,7 +396,7 @@ def fill_all_bags(create_problem_fn, search_algorithm_fn,
         if counter[0] > 0 and (n_bags_per_state * counter[0] % 20) == 0 and \
             score_fn is not None and last_score_computation < counter[0]:
             s = score_fn(total_state)
-            print(">>> Current score: ", s, s * n_bags / (n_bags_per_state * counter[0]))
+            print(">>> Current score: ", s, s * (n_bags - 100) / (n_bags_per_state * counter[0]))
             last_score_computation = counter[0]
 
         if counter[0] > 0 and (n_bags_per_state * counter[0] % 30) == 0 and \

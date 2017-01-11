@@ -96,5 +96,5 @@ print "Score: ", scores.mean()
 
 
 ##  Submission: submission_2016-12-23-19-02.csv
-##       Score: 41243.9577061
+##       Score: 26923
 ##      Kaggle: 27047.92870

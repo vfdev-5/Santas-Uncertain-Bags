@@ -5,42 +5,9 @@ import numpy as np
 import sys
 sys.path.append('../common')
 from utils import validation
-
+from utils import MAX_WEIGHT, N_BAGS
 
 np.random.seed(2016)
-
-# Lbs to Kg
-lbs_kg = 0.454
-kg_lbs = 1.0/lbs_kg
-
-
-max_weights = {"horse": 10.0 * kg_lbs, "ball": 1.0 * kg_lbs, "bike": 15.0 * kg_lbs, "train": 3.0 * kg_lbs,
-              "coal": 10.0, "book": 2.0 * kg_lbs, "doll": 2.0 * kg_lbs, "blocks": 10.0, "gloves": 0.3 * kg_lbs}
-
-min_weights = {"horse": 0.1 * kg_lbs, "ball": 0.1 * kg_lbs, "bike": 7.0 * kg_lbs, "train": 0.1 * kg_lbs, "coal": 0.001,
-              "book": 0.1 * kg_lbs, "doll": 0.1 * kg_lbs, "blocks": 0.001, "gloves": 0.05 * kg_lbs}
-
-
-def weight(gift_type):
-    if gift_type == "horse":
-        return max(0, np.random.normal(5, 2, 1)[0])
-    if gift_type == "ball":
-        return max(0, 1 + np.random.normal(1, 0.3, 1)[0])
-    if gift_type == "bike":
-        return max(0, np.random.normal(20, 10, 1)[0])
-    if gift_type == "train":
-        return max(0, np.random.normal(10, 5, 1)[0])
-    if gift_type == "coal":
-        return 47 * np.random.beta(0.5, 0.5, 1)[0]
-    if gift_type == "book":
-        return np.random.chisquare(2, 1)[0]
-    if gift_type == "doll":
-        return np.random.gamma(5, 1, 1)[0]
-    if gift_type == "blocks":
-        return np.random.triangular(5, 10, 20, 1)[0]
-    if gift_type == "gloves":
-        return 3.0 + np.random.rand(1)[0] if np.random.rand(1) < 0.3 else np.random.rand(1)[0]
-
 
 data_file = '../input/gifts.csv'
 submission_file = '../results/submission_' + \
@@ -48,44 +15,50 @@ submission_file = '../results/submission_' + \
                   '.csv'
 
 
+fix_weight = {
+    'ball': 1.70,
+    'bike': 20.86,
+    'blocks': 12.0,
+    'book': 1.9,
+    'coal': 45,
+    'doll': 4.9,
+    'gloves': 1.21,
+    'horse': 4.83,
+    'train': 9.6
+}
+
 #  bags = {bag_id: (total_weight,[gift_1, gift_2, ...]), ... }
 bags = {}
-n_bags = 1000
 bag_id = 0
-max_weight = 45
+alpha = 0.7
+goal_weight = alpha * MAX_WEIGHT
 
 total_counter = 0
 counter = 0
-
 not_added_gifts = []
 with open(data_file, 'r') as r:
-
     header = r.readline()
     print header
 
     while True:
-
         gift = r.readline().strip()
-
         if gift == '':
             break
         gift_type = gift.split('_')[0]
-        gift_weight = weight(gift_type)
-        # gift_weight = max(min(weight(gift_type), max_weights[gift_type]), min_weights[gift_type])
-        # gift_weight = max_weights[gift_type]
+        gift_weight = fix_weight[gift_type]
 
         if bag_id not in bags:
             bags[bag_id] = [gift_weight, [gift]]
         else:
             total_weight, gifts = bags[bag_id]
-            if total_weight + gift_weight < max_weight:
+            if total_weight + gift_weight < goal_weight:
                 bags[bag_id][0] += gift_weight
                 bags[bag_id][1].append(gift)
             else:
                 not_added_gifts.append(gift)
                 counter += 1
 
-        bag_id = bag_id+1 if bag_id+1 < n_bags else 0
+        bag_id = bag_id+1 if bag_id+1 < N_BAGS else 0
         total_counter += 1
 
 print 'Number of not added gifts: {}/{}'.format(counter, total_counter)
@@ -93,12 +66,10 @@ print 'Number of not added gifts: {}/{}'.format(counter, total_counter)
 counter = 0
 for gift in not_added_gifts:
     gift_type = gift.split('_')[0]
-    gift_weight = weight(gift_type)
-    # gift_weight = max_weights[gift_type]
-    # gift_weight = max(min(weight(gift_type), max_weights[gift_type]), min_weights[gift_type])
+    gift_weight = fix_weight[gift_type]
     for bag_id in bags:
         total_weight, gifts = bags[bag_id]
-        if total_weight + gift_weight < max_weight:
+        if total_weight + gift_weight < goal_weight:
             bags[bag_id][0] += gift_weight
             bags[bag_id][1].append(gift)
             counter += 1
@@ -109,9 +80,10 @@ print 'Number of not added gifts: {}/{}'.format(len(not_added_gifts) - counter, 
 
 
 # Validation :
-scores = validation(bags, weight, 5)
+scores = validation(bags, count=5)
 print "Score: ", scores.mean()
 
+print "Filled bags : ", len(bags)
 
 # with open(submission_file, 'w') as w:
 #     w.write("Gifts\n")
@@ -121,7 +93,7 @@ print "Score: ", scores.mean()
 
 
 ##  Submission:
-##       Score:
+##       Score: 31716
 ##      Kaggle:
 
 

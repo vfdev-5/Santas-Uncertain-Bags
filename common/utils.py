@@ -30,7 +30,28 @@ GIFT_TYPES = sorted(list(AVAILABLE_GIFTS.keys()))
 N_TYPES = len(GIFT_TYPES)
 
 
-def validation(bags, weigth_func, count=5):
+def weight(gift_type):
+    if gift_type == "horse":
+        return max(0, np.random.normal(5, 2, 1)[0])
+    if gift_type == "ball":
+        return max(0, 1 + np.random.normal(1, 0.3, 1)[0])
+    if gift_type == "bike":
+        return max(0, np.random.normal(20, 10, 1)[0])
+    if gift_type == "train":
+        return max(0, np.random.normal(10, 5, 1)[0])
+    if gift_type == "coal":
+        return 47 * np.random.beta(0.5, 0.5, 1)[0]
+    if gift_type == "book":
+        return np.random.chisquare(2,1)[0]
+    if gift_type == "doll":
+        return np.random.gamma(5, 1, 1)[0]
+    if gift_type == "blocks":
+        return np.random.triangular(5, 10, 20, 1)[0]
+    if gift_type == "gloves":
+        return 3.0 + np.random.rand(1)[0] if np.random.rand(1) < 0.3 else np.random.rand(1)[0]
+
+
+def validation(bags, weigth_func=weight, count=5):
     """
     Method to compute total weights of the bags using weight_func count times
     :param bags:
@@ -53,27 +74,6 @@ def validation(bags, weigth_func, count=5):
 
         scores[c] = score
     return scores
-
-
-def weight(gift_type):
-    if gift_type == "horse":
-        return max(0, np.random.normal(5, 2, 1)[0])
-    if gift_type == "ball":
-        return max(0, 1 + np.random.normal(1, 0.3, 1)[0])
-    if gift_type == "bike":
-        return max(0, np.random.normal(20, 10, 1)[0])
-    if gift_type == "train":
-        return max(0, np.random.normal(10, 5, 1)[0])
-    if gift_type == "coal":
-        return 47 * np.random.beta(0.5, 0.5, 1)[0]
-    if gift_type == "book":
-        return np.random.chisquare(2,1)[0]
-    if gift_type == "doll":
-        return np.random.gamma(5, 1, 1)[0]
-    if gift_type == "blocks":
-        return np.random.triangular(5, 10, 20, 1)[0]
-    if gift_type == "gloves":
-        return 3.0 + np.random.rand(1)[0] if np.random.rand(1) < 0.3 else np.random.rand(1)[0]
 
 
 def weight2(gift_type, count=1000):

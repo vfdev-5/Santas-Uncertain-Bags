@@ -68,7 +68,6 @@ with open(data_file, 'r') as r:
             break
         gift_type = gift.split('_')[0]
 
-        # gift_weight = max(min(weight(gift_type), max_weights[gift_type]), min_weights[gift_type])
         gift_weight = max_weights[gift_type]
 
         if bag_id not in bags:
@@ -90,19 +89,13 @@ print 'Number of not added gifts: {}/{}'.format(counter, total_counter)
 scores = validation(bags, weight, 5)
 print "Score: ", scores.mean()
 
-with open(submission_file, 'w') as w:
-    w.write("Gifts\n")
-    for bag_id in bags:
-        _, gifts = bags[bag_id]
-        w.write(' '.join(gifts) + '\n')
-
-
-##  Submission: submission_2016-12-23-19-25.csv
-##       Score: 47814.9779736
-##      Kaggle: 29384.37065
+# with open(submission_file, 'w') as w:
+#     w.write("Gifts\n")
+#     for bag_id in bags:
+#         _, gifts = bags[bag_id]
+#         w.write(' '.join(gifts) + '\n')
 
 
 
 ##  Submission: submission_2016-12-23-19-16.csv
-##       Score: 38805.2219723
-##      Kaggle: 26540.48970
+##       Score: 29433.2219723
