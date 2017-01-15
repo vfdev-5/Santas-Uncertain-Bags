@@ -29,6 +29,8 @@ AVAILABLE_GIFTS = {
 GIFT_TYPES = sorted(list(AVAILABLE_GIFTS.keys()))
 N_TYPES = len(GIFT_TYPES)
 
+AVAILABLE_GIFTS_LIST = [AVAILABLE_GIFTS[g] for g in GIFT_TYPES]
+
 
 def weight(gift_type):
     if gift_type == "horse":
@@ -115,6 +117,26 @@ def bag_weight(bag, n1=100):
         for i in range(count):
             weight += weight3(index, n1)
     return weight
+
+
+def score2(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
+    scores = np.zeros(count)
+    rejected_bags = np.zeros(count)
+    for c in range(count):
+        score = 0
+        rejected = 0
+        total_weight_ = bag_weight(state, n1=1)
+        if total_weight_ < max_weight:
+            score += total_weight_
+        else:
+            rejected += 1
+
+        rejected_bags[c] = rejected
+        scores[c] = score
+    if return_rejected:
+        return np.mean(scores), np.mean(rejected_bags)
+    else:
+        return np.mean(scores)
 
 
 def score(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
