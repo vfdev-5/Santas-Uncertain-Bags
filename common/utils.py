@@ -114,8 +114,7 @@ def weight3(index, count=100):
 def bag_weight(bag, n1=100):
     weight = 0
     for index, count in enumerate(bag):
-        for i in range(count):
-            weight += weight3(index, n1)
+        weight += sum([weight3(index, n1) for i in range(count)])
     return weight
 
 
@@ -158,3 +157,34 @@ def score(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
     else:
         return np.mean(scores)
 
+def score_stats(state, count=100, max_weight=MAX_WEIGHT):
+    scores = np.zeros(count)
+    rejected_bags = np.zeros(count)
+    for c in range(count):
+        score = 0
+        rejected = 0
+        for bag in state:
+            total_weight_ = bag_weight(bag, n1=1)
+            if total_weight_ < max_weight:
+                score += total_weight_
+            else:
+                rejected += 1
+        rejected_bags[c] = rejected
+        scores[c] = score
+    return np.mean(scores), np.std(scores), np.mean(rejected_bags), np.std(rejected_bags)
+    
+    
+def mean_std(state, count=100):
+    w = []
+    for c in range(count):
+        m = 0
+        for i, v in enumerate(state):
+            if v > 0:
+                m += sum([weight_by_index(i) for j in range(v)])
+        w.append(m)
+    return np.mean(w), np.std(w)
+
+
+def mean_n_sigma(state, n, count=100):
+    m, s = mean_std(state, count)
+    return m + n*s
