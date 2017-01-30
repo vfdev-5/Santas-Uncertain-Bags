@@ -138,7 +138,7 @@ def score2(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
         return np.mean(scores)
 
 
-def score(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
+def score(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False, return_std=False):
     scores = np.zeros(count)
     rejected_bags = np.zeros(count)
     for c in range(count):
@@ -153,8 +153,12 @@ def score(state, count=100, max_weight=MAX_WEIGHT, return_rejected=False):
         rejected_bags[c] = rejected
         scores[c] = score
     if return_rejected:
+        if return_std:
+            return np.mean(scores), np.mean(rejected_bags), np.std(scores), np.std(rejected_bags)
         return np.mean(scores), np.mean(rejected_bags)
     else:
+        if return_std:
+            return np.mean(scores), np.std(scores)
         return np.mean(scores)
 
 def score_stats(state, count=100, max_weight=MAX_WEIGHT):
